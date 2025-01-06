@@ -28,11 +28,11 @@ def get_alert():
         
 
 @api_blueprint.route('/alert/switch', methods=['POST'])
-def alter_status():
+def alert_switch():
     """
-    Endpoint to publish a alter status message.
+    Endpoint to publish a alert_switch message.
     """
-    print("Entering alter_status function")
+    print("Entering alert_switch function")
     try:
         db = get_database()
         print("Database connection established")
@@ -41,7 +41,7 @@ def alter_status():
         alert_status = alert_status_collection.find_one()
         print("alter status retrieved")
 
-        if alter_status is None:
+        if alert_status is None:
             return jsonify({"error": "alert status not found"}), 404
 
         new_value = not alert_status['value']
@@ -52,6 +52,28 @@ def alter_status():
     except Exception as e:
         print(f"Error switching alert status: {e}")
         return jsonify({"error": "Failed to switch alert status"}), 500
+
+@api_blueprint.route('/sensor/status', methods=['GET'])
+def get_status():
+    """
+    Endpoint to get the current sensor status.
+    """
+    print("Entering get_status function")
+    try:
+        db = get_database()
+        print("Database connection established")
+        sensor_status_collection = db['sensor_data']
+
+        sensor_status = sensor_status_collection.find_one()
+        print("Sensor status retrieved")
+
+        if sensor_status is None:
+            return jsonify({"error": "Sensor status not found"}), 404
+
+        return jsonify({"status": sensor_status['value']}), 200
+    except Exception as e:
+        print(f"Error retrieving sensor status: {e}")
+        return jsonify({"error": "Failed to retrieve sensor status"}), 500
 
 
 @api_blueprint.route('/')
