@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from .db import get_database
 import base64
 
 api_blueprint = Blueprint("api", __name__)
