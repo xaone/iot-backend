@@ -75,6 +75,32 @@ def get_status():
         print(f"Error retrieving sensor status: {e}")
         return jsonify({"error": "Failed to retrieve sensor status"}), 500
 
+@api_blueprint.route('/sensor/switch', methods=['POST'])
+def switch_status():
+    """
+    Endpoint to publish a switch status message.
+    """
+    print("Entering switch_status function")
+    try:
+        db = get_database()
+        print("Database connection established")
+        sensor_status_collection = db['sensor_data']
+
+        sensor_status = sensor_status_collection.find_one()
+        print("Sensor status retrieved")
+
+        if sensor_status is None:
+            return jsonify({"error": "Sensor status not found"}), 404
+
+        new_value = not sensor_status['value']
+
+        sensor_status_collection.update_one({}, {"$set": {"value": new_value}})
+        print("Sensor status updated")
+
+        return jsonify({"status": "Sensor status switched", "new_value": new_value}), 200
+    except Exception as e:
+        print(f"Error switching sensor status: {e}")
+        return jsonify({"error": "Failed to switch sensor status"}), 500
 
 @api_blueprint.route('/')
 def hello_world():
