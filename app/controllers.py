@@ -108,7 +108,3 @@ def hello_world():
     A simple hello world endpoint.
     """
     return "Hello World", 200
-
-@api_blueprint.route('/dummy')
-def dummy():
-    return "hello dolly", 200
