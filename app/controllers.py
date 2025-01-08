@@ -102,6 +102,29 @@ def switch_status():
         print(f"Error switching sensor status: {e}")
         return jsonify({"error": "Failed to switch sensor status"}), 500
 
+@api_blueprint.route('/image/display', methods=['GET'])
+def get_all_images():
+    """
+    Endpoint to get all images from the MongoDB collection.
+    """
+    print("Entering get_all_images function")
+    try:
+        db = get_database()
+        print("Database connection established")
+        images_collection = db['images']
+        images = images_collection.find({}, {"_id": 0, "image_data": 1})
+        print("Images retrieved")
+
+        image_list = []
+        for image in images:
+            image_data_base64 = base64.b64encode(image['image_data']).decode('utf-8')
+            image_list.append({"image_data": image_data_base64})
+
+        return jsonify(image_list), 200
+    except Exception as e:
+        print(f"Error retrieving images: {e}")
+        return jsonify({"error": "Failed to retrieve images"}), 500
+
 @api_blueprint.route('/')
 def hello_world():
     """
