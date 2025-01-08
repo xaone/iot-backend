@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from .db import get_database
 import base64
+from .email_alert import process_base64_image
 
 api_blueprint = Blueprint("api", __name__)
 
@@ -124,6 +125,36 @@ def get_all_images():
     except Exception as e:
         print(f"Error retrieving images: {e}")
         return jsonify({"error": "Failed to retrieve images"}), 500
+
+from flask import request, jsonify
+
+@api_blueprint.route('/alert/email', methods=['POST'])
+def email_alert():
+    """
+    Endpoint to receive a base64 image and process it.
+    # """
+    # if request.content_type != 'application/json':
+    #     return jsonify({"error": "Unsupported Media Type, expected application/json"}), 415
+    
+    try:
+        data = request.json
+        base64_image = data.get('image')
+        distance = data.get('distance')
+
+        if not base64_image:
+            return jsonify({"error": "No image provided"}), 400
+
+        result = process_base64_image(base64_image, distance)
+
+        if result:
+            return jsonify({"status": "Image processed successfully"}), 200
+        else:
+            return jsonify({"error": "Failed to process image"}), 500
+    except Exception as e:
+        print(f"Error in email_alert endpoint: {e}")
+        return jsonify({"error": "Failed to process request"}), 500
+
+
 
 @api_blueprint.route('/')
 def hello_world():
